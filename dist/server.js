@@ -6,43 +6,13 @@ var _hapi2 = _interopRequireDefault(_hapi);
 
 var _apolloServerHapi = require('apollo-server-hapi');
 
-var _graphql = require('graphql');
+var _index = require('./schemas/index');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const HOST = 'localhost';
 const PORT = 3000;
 process.on('unhandledRejection', r => console.log(r));
-const personType = new _graphql.GraphQLObjectType({
-    name: 'Person',
-    description: 'A member of a community',
-    fields: {
-        id: {
-            type: _graphql.GraphQLID,
-            description: 'unique id'
-        },
-        name: {
-            type: _graphql.GraphQLString,
-            description: 'AKA short_text'
-        }
-    }
-});
-const queryType = new _graphql.GraphQLObjectType({
-    name: 'Root',
-    description: 'the root query',
-    fields: {
-        person: {
-            type: personType,
-            resolve: async () => ({
-                name: 'Eric',
-                id: 'people:1'
-            })
-        }
-    }
-});
-const schema = new _graphql.GraphQLSchema({
-    query: queryType
-});
 async function StartServer() {
     const server = new _hapi2.default.server({
         host: HOST,
@@ -53,7 +23,7 @@ async function StartServer() {
         options: {
             path: '/graphql',
             graphqlOptions: {
-                schema: schema
+                schema: _index.schema
             },
             route: {
                 cors: true
@@ -66,7 +36,7 @@ async function StartServer() {
             path: '/graphiql',
             graphiqlOptions: {
                 endpointURL: '/graphql',
-                schema: schema
+                schema: _index.schema
             },
             route: {
                 cors: true
