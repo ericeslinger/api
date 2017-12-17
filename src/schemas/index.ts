@@ -1,30 +1,37 @@
 import { makeExecutableSchema } from 'graphql-tools';
-import { Kind } from 'graphql/language';
 
 import { usersSchema } from './users.schema';
+import { profilesSchema } from './profiles.schema';
+import { communitiesSchema } from './communities.schema';
+import { postsSchema } from './posts.schema';
 
-export const rootSchema = `
+import JSONScalar from 'graphql-type-json';
+import { GraphQLDateTime } from 'graphql-iso-date';
+
+export const baseSchema = `
+  scalar DateTime
+  scalar JSON
+  interface Node {
+    id: ID!
+  }
+  type Query {
+    node(id: ID!): Node
+  }
   schema {
     query: Query
   }
 `;
 
 export const schema = makeExecutableSchema({
-  typeDefs: [usersSchema],
+  typeDefs: [
+    baseSchema,
+    usersSchema,
+    profilesSchema,
+    postsSchema,
+    communitiesSchema,
+  ],
   resolvers: {
-    Date: {
-      __parseValue(value) {
-        return new Date(value); // value from the client
-      },
-      __serialize(value) {
-        return value.getTime(); // value sent to the client
-      },
-      __parseLiteral(ast) {
-        if (ast.kind === Kind.INT) {
-          return parseInt(ast.value, 10); // ast value is always in string format
-        }
-        return null;
-      },
-    },
+    DateTime: GraphQLDateTime,
+    JSON: JSONScalar,
   },
 });

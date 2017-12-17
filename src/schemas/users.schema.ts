@@ -1,15 +1,14 @@
 export const usersSchema = `
-  scalar Date
 
-  type Query {
+  extend type Query {
     users: [User]
-    userById(id: ID!): User
   }
 
-  type User {
+  type User implements Node {
     id: ID!
     name: String!
-    createdAt: Date
-    updatedAt: Date
+    profiles: [Profile]
+    createdAt: DateTime!
+    updatedAt: DateTime!
   }
 `;

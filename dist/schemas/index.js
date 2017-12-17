@@ -1,37 +1,41 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
-exports.schema = exports.rootSchema = undefined;
+exports.schema = exports.baseSchema = undefined;
 
 var _graphqlTools = require('graphql-tools');
 
-var _language = require('graphql/language');
-
 var _users = require('./users.schema');
 
-const rootSchema = exports.rootSchema = `
+var _profiles = require('./profiles.schema');
+
+var _communities = require('./communities.schema');
+
+var _posts = require('./posts.schema');
+
+var _graphqlTypeJson = require('graphql-type-json');
+
+var _graphqlIsoDate = require('graphql-iso-date');
+
+const baseSchema = exports.baseSchema = `
+  scalar DateTime
+  scalar JSON
+  interface Node {
+    id: ID!
+  }
+  type Query {
+    node(id: ID!): Node
+  }
   schema {
     query: Query
   }
 `;
 const schema = exports.schema = (0, _graphqlTools.makeExecutableSchema)({
-    typeDefs: [_users.usersSchema],
-    resolvers: {
-        Date: {
-            __parseValue(value) {
-                return new Date(value); // value from the client
-            },
-            __serialize(value) {
-                return value.getTime(); // value sent to the client
-            },
-            __parseLiteral(ast) {
-                if (ast.kind === _language.Kind.INT) {
-                    return parseInt(ast.value, 10); // ast value is always in string format
-                }
-                return null;
-            }
-        }
-    }
+  typeDefs: [baseSchema, _users.usersSchema, _profiles.profilesSchema, _posts.postsSchema, _communities.communitiesSchema],
+  resolvers: {
+    DateTime: _graphqlIsoDate.GraphQLDateTime,
+    JSON: _graphqlTypeJson.JSONScalar
+  }
 });
