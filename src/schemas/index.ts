@@ -1,12 +1,14 @@
 import { makeExecutableSchema } from 'graphql-tools';
 
-import { usersSchema } from './users.schema';
-import { profilesSchema } from './profiles.schema';
-import { communitiesSchema } from './communities.schema';
-import { postsSchema } from './posts.schema';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 import JSONScalar from 'graphql-type-json';
 import { GraphQLDateTime } from 'graphql-iso-date';
+
+function load(fn: string) {
+  return readFileSync(join(__dirname, fn)).toString();
+}
 
 export const baseSchema = `
   scalar DateTime
@@ -25,10 +27,10 @@ export const baseSchema = `
 export const schema = makeExecutableSchema({
   typeDefs: [
     baseSchema,
-    usersSchema,
-    profilesSchema,
-    postsSchema,
-    communitiesSchema,
+    load('communities.graphql'),
+    load('users.graphql'),
+    load('profiles.graphql'),
+    load('posts.graphql'),
   ],
   resolvers: {
     DateTime: GraphQLDateTime,
