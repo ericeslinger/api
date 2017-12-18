@@ -7,6 +7,10 @@ exports.schema = exports.baseSchema = undefined;
 
 var _graphqlTools = require('graphql-tools');
 
+var _knex = require('knex');
+
+var _knex2 = _interopRequireDefault(_knex);
+
 var _fs = require('fs');
 
 var _path = require('path');
@@ -17,11 +21,23 @@ var _graphqlTypeJson2 = _interopRequireDefault(_graphqlTypeJson);
 
 var _graphqlIsoDate = require('graphql-iso-date');
 
+var _resolvers = require('./resolvers');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function load(fn) {
     return (0, _fs.readFileSync)((0, _path.join)(__dirname, fn)).toString();
 }
+const client = (0, _knex2.default)({
+    client: 'pg',
+    connection: {
+        database: 'florence',
+        user: 'flo',
+        host: 'localhost',
+        port: 5432,
+        password: 'fumfum'
+    }
+});
 const baseSchema = exports.baseSchema = `
   scalar DateTime
   scalar JSON
@@ -37,8 +53,5 @@ const baseSchema = exports.baseSchema = `
 `;
 const schema = exports.schema = (0, _graphqlTools.makeExecutableSchema)({
     typeDefs: [baseSchema, load('communities.graphql'), load('users.graphql'), load('profiles.graphql'), load('posts.graphql')],
-    resolvers: {
-        DateTime: _graphqlIsoDate.GraphQLDateTime,
-        JSON: _graphqlTypeJson2.default
-    }
+    resolvers: Object.assign({ DateTime: _graphqlIsoDate.GraphQLDateTime, JSON: _graphqlTypeJson2.default }, (0, _resolvers.makeResolvers)(client))
 });

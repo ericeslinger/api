@@ -13,6 +13,8 @@ create table florence.users (
 create table florence.profiles (
   id text not null primary key,
   name text not null,
+  about jsonb not null default '{}'::jsonb,
+  draft jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -55,4 +57,14 @@ create table florence.posts_profiles_join (
   post_id text not null references florence.posts(id),
   profile_id text not null references florence.profiles(id),
   created_at timestamptz not null default now()
+);
+
+create view florence.type_lookup as (
+  select 'users' as type, id from florence.users
+  union all
+  select 'profiles' as type, id from florence.profiles
+  union all
+  select 'communities' as type, id from florence.communities
+  union all
+  select 'posts' as type, id from florence.posts
 );

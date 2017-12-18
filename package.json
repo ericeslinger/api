@@ -20,6 +20,7 @@
     "@types/chai": "^4.0.4",
     "@types/chai-as-promised": "7.1.0",
     "@types/core-js": "^0.9.43",
+    "@types/knex": "0.0.67",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.28",
     "babel-core": "^6.26.0",
@@ -45,6 +46,8 @@
     "graphql-tools": "^2.13.0",
     "graphql-type-json": "^0.1.4",
     "hapi": "^17.1.1",
-    "pg": "^7.4.0"
+    "knex": "^0.14.2",
+    "pg": "^7.4.0",
+    "ulid": "^2.2.3"
   }
 }

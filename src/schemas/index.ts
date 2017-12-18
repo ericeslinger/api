@@ -1,4 +1,5 @@
 import { makeExecutableSchema } from 'graphql-tools';
+import Knex from 'knex';
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -6,9 +7,22 @@ import { join } from 'path';
 import JSONScalar from 'graphql-type-json';
 import { GraphQLDateTime } from 'graphql-iso-date';
 
+import { makeResolvers } from './resolvers';
+
 function load(fn: string) {
   return readFileSync(join(__dirname, fn)).toString();
 }
+
+const client = Knex({
+  client: 'pg',
+  connection: {
+    database: 'florence',
+    user: 'flo',
+    host: 'localhost',
+    port: 5432,
+    password: 'fumfum',
+  },
+});
 
 export const baseSchema = `
   scalar DateTime
@@ -35,5 +49,6 @@ export const schema = makeExecutableSchema({
   resolvers: {
     DateTime: GraphQLDateTime,
     JSON: JSONScalar,
+    ...makeResolvers(client),
   },
 });
