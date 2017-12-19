@@ -3,8 +3,18 @@ import Knex from 'knex';
 export function makeResolvers(db: Knex) {
   return {
     Query: {
-      users: (root, args) => db('florence.users').select('*'),
-      profiles: (root, args) => db('florence.profiles').select('*'),
+      profiles: (obj, args, context, info) => {
+        console.log(
+          JSON.stringify(
+            info.fieldNodes.map(v =>
+              v.selectionSet.selections.map(i => i.name.value),
+            ),
+            null,
+            2,
+          ),
+        );
+        return db('florence.profiles').select('*');
+      },
       node: async (root, args) => {
         const type = await db('florence.type_lookup')
           .where({ id: args.id })

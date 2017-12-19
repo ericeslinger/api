@@ -1,4 +1,5 @@
 import { makeExecutableSchema } from 'graphql-tools';
+import mergeOptions from 'merge-options';
 import Knex from 'knex';
 
 import { readFileSync } from 'fs';
@@ -7,7 +8,8 @@ import { join } from 'path';
 import JSONScalar from 'graphql-type-json';
 import { GraphQLDateTime } from 'graphql-iso-date';
 
-import { makeResolvers } from './resolvers';
+import { makeUserResolver } from './users.model';
+import { makeProfileResolver } from './profiles.model';
 
 function load(fn: string) {
   return readFileSync(join(__dirname, fn)).toString();
@@ -15,6 +17,7 @@ function load(fn: string) {
 
 const client = Knex({
   client: 'pg',
+  debug: true,
   connection: {
     database: 'florence',
     user: 'flo',
@@ -46,9 +49,13 @@ export const schema = makeExecutableSchema({
     load('profiles.graphql'),
     load('posts.graphql'),
   ],
-  resolvers: {
-    DateTime: GraphQLDateTime,
-    JSON: JSONScalar,
-    ...makeResolvers(client),
-  },
+  resolvers: mergeOptions(
+    {},
+    {
+      DateTime: GraphQLDateTime,
+      JSON: JSONScalar,
+    },
+    makeProfileResolver(client),
+    makeUserResolver(client),
+  ),
 });
