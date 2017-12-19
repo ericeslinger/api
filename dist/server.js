@@ -22,11 +22,19 @@ async function StartServer() {
         plugin: _apolloServerHapi.graphqlHapi,
         options: {
             path: '/graphql',
-            graphqlOptions: {
-                schema: _index.schema
-            },
+            graphqlOptions: async request => ({
+                schema: _index.schema,
+                context: request
+            }),
             route: {
-                cors: true
+                cors: true,
+                pre: [{
+                    method: async req => {
+                        console.log('REEEEEQUEEESSST');
+                        return true;
+                    },
+                    assign: 'loaders'
+                }]
             }
         }
     });

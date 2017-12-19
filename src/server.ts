@@ -17,11 +17,21 @@ async function StartServer() {
     plugin: graphqlHapi,
     options: {
       path: '/graphql',
-      graphqlOptions: {
+      graphqlOptions: async request => ({
         schema: schema,
-      },
+        context: request,
+      }),
       route: {
         cors: true,
+        pre: [
+          {
+            method: async req => {
+              console.log('REEEEEQUEEESSST');
+              return true;
+            },
+            assign: 'loaders',
+          },
+        ],
       },
     },
   });

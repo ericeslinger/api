@@ -36,7 +36,7 @@ function load(fn) {
 }
 const client = (0, _knex2.default)({
     client: 'pg',
-    debug: true,
+    debug: false,
     connection: {
         database: 'florence',
         user: 'flo',

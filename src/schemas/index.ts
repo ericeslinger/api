@@ -17,7 +17,7 @@ function load(fn: string) {
 
 const client = Knex({
   client: 'pg',
-  debug: true,
+  debug: false,
   connection: {
     database: 'florence',
     user: 'flo',

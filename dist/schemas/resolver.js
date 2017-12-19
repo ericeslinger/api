@@ -8,6 +8,12 @@ class Resolver {
         this.db = db;
         this.table = table;
     }
+    join(args) {
+        return (obj, _args, context, info) => {
+            console.log(context.pre);
+            return this.db(args.joinTable).join(args.otherTable, `${args.joinTable}.${args.thatField}`, '=', `${args.otherTable}.id`).where({ [args.thisField]: obj.id }).select(`${args.otherTable}.*`);
+        };
+    }
     getById(id) {
         return this.db(this.table).where({ id }).select('*');
     }

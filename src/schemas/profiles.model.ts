@@ -11,17 +11,12 @@ export function makeProfileResolver(db: Knex) {
       profiles: (obj, args, context, info) => r.getAll(),
     },
     Profile: {
-      users: (obj, args, context, info) => {
-        return db('florence.profiles_users_join')
-          .join(
-            'florence.users',
-            'florence.profiles_users_join.user_id',
-            '=',
-            'florence.users.id',
-          )
-          .where({ 'florence.profiles_users_join.profile_id': obj.id })
-          .select('florence.users.*');
-      },
+      users: r.join({
+        joinTable: 'florence.profiles_users_join',
+        thatField: 'user_id',
+        thisField: 'profile_id',
+        otherTable: 'florence.users',
+      }),
     },
   };
 }
