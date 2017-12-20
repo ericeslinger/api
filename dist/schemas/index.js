@@ -3,17 +3,14 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.schema = exports.baseSchema = undefined;
+exports.baseSchema = undefined;
+exports.schema = schema;
 
 var _graphqlTools = require('graphql-tools');
 
 var _mergeOptions = require('merge-options');
 
 var _mergeOptions2 = _interopRequireDefault(_mergeOptions);
-
-var _knex = require('knex');
-
-var _knex2 = _interopRequireDefault(_knex);
 
 var _fs = require('fs');
 
@@ -34,17 +31,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function load(fn) {
     return (0, _fs.readFileSync)((0, _path.join)(__dirname, fn)).toString();
 }
-const client = (0, _knex2.default)({
-    client: 'pg',
-    debug: false,
-    connection: {
-        database: 'florence',
-        user: 'flo',
-        host: 'localhost',
-        port: 5432,
-        password: 'fumfum'
-    }
-});
 const baseSchema = exports.baseSchema = `
   scalar DateTime
   scalar JSON
@@ -58,10 +44,13 @@ const baseSchema = exports.baseSchema = `
     query: Query
   }
 `;
-const schema = exports.schema = (0, _graphqlTools.makeExecutableSchema)({
-    typeDefs: [baseSchema, load('communities.graphql'), load('users.graphql'), load('profiles.graphql'), load('posts.graphql')],
-    resolvers: (0, _mergeOptions2.default)({}, {
-        DateTime: _graphqlIsoDate.GraphQLDateTime,
-        JSON: _graphqlTypeJson2.default
-    }, (0, _profiles.makeProfileResolver)(client), (0, _users.makeUserResolver)(client))
-});
+function schema(client) {
+    console.log('schema called');
+    return (0, _graphqlTools.makeExecutableSchema)({
+        typeDefs: [baseSchema, load('communities.graphql'), load('users.graphql'), load('profiles.graphql'), load('posts.graphql')],
+        resolvers: (0, _mergeOptions2.default)({}, {
+            DateTime: _graphqlIsoDate.GraphQLDateTime,
+            JSON: _graphqlTypeJson2.default
+        }, (0, _profiles.makeProfileResolver)(client), (0, _users.makeUserResolver)(client))
+    });
+}

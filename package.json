@@ -4,7 +4,8 @@
   "description": "API server for Florence, a DIY community building toolkit",
   "main": "dist/index.js",
   "scripts": {
-    "test": "gulp maketest && mocha testbuild/*.spec.js && gulp testclean"
+    "test": "gulp maketest && mocha testbuild/*.spec.js && gulp testclean",
+    "start": "gulp run"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
     "@types/knex": "0.0.67",
     "@types/mocha": "^2.2.43",
     "@types/node": "^8.0.28",
+    "@types/node-fetch": "^1.6.7",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "chai": "^4.1.2",
@@ -48,6 +50,7 @@
     "hapi": "^17.1.1",
     "knex": "^0.14.2",
     "merge-options": "^1.0.0",
+    "node-fetch": "^1.7.3",
     "pg": "^7.4.0",
     "ulid": "^2.2.3"
   }

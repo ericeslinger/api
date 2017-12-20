@@ -17,6 +17,6 @@ function build() {
     .pipe(gulp.dest(config.dest));
 }
 
-gulp.task('build', build);
+gulp.task('buildScripts', build);
 
 module.exports = build;

@@ -1,62 +1,73 @@
 import Hapi from 'hapi';
 import { graphqlHapi, graphiqlHapi } from 'apollo-server-hapi';
 import { schema } from './schemas/index';
+import Knex from 'knex';
 
 const HOST = 'localhost';
 const PORT = 3000;
 
 process.on('unhandledRejection', r => console.log(r));
 
-async function StartServer() {
-  const server = new Hapi.server({
-    host: HOST,
-    port: PORT,
-  });
+export class APIServer {
+  server = new Hapi.server({ host: HOST, port: PORT });
+  knex: Knex;
 
-  await server.register({
-    plugin: graphqlHapi,
-    options: {
-      path: '/graphql',
-      graphqlOptions: async request => ({
-        schema: schema,
-        context: request,
-      }),
-      route: {
-        cors: true,
-        pre: [
-          {
-            method: async req => {
-              console.log('REEEEEQUEEESSST');
-              return true;
+  async start(withUI: boolean) {
+    this.knex = Knex({
+      client: 'pg',
+      debug: false,
+      connection: {
+        database: 'florence',
+        user: 'flo',
+        host: 'localhost',
+        port: 5432,
+        password: 'fumfum',
+      },
+    });
+
+    const memoSchema = schema(this.knex);
+
+    await this.server.register({
+      plugin: graphqlHapi,
+      options: {
+        path: '/graphql',
+        graphqlOptions: async request => ({
+          schema: memoSchema,
+          context: request,
+        }),
+        route: {
+          cors: true,
+          pre: [
+            {
+              method: async req => {
+                return true;
+              },
+              assign: 'loaders',
             },
-            assign: 'loaders',
+          ],
+        },
+      },
+    });
+    if (withUI) {
+      await this.server.register({
+        plugin: graphiqlHapi,
+        options: {
+          path: '/graphiql',
+          graphiqlOptions: {
+            endpointURL: '/graphql',
+            schema: memoSchema,
           },
-        ],
-      },
-    },
-  });
-
-  await server.register({
-    plugin: graphiqlHapi,
-    options: {
-      path: '/graphiql',
-      graphiqlOptions: {
-        endpointURL: '/graphql',
-        schema: schema,
-      },
-      route: {
-        cors: true,
-      },
-    },
-  });
-
-  try {
-    await server.start();
-  } catch (err) {
-    console.log(`Error while starting server: ${err.message}`);
+          route: {
+            cors: true,
+          },
+        },
+      });
+    }
+    await this.server.start();
+    console.log(`listening on http://localhost:3000/graphiql`);
   }
-
-  console.log(`Server running at: ${server.info.uri}`);
+  async stop() {
+    await this.knex.destroy();
+    return this.server.stop();
+  }
 }
-
-StartServer();

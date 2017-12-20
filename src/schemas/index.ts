@@ -15,18 +15,6 @@ function load(fn: string) {
   return readFileSync(join(__dirname, fn)).toString();
 }
 
-const client = Knex({
-  client: 'pg',
-  debug: false,
-  connection: {
-    database: 'florence',
-    user: 'flo',
-    host: 'localhost',
-    port: 5432,
-    password: 'fumfum',
-  },
-});
-
 export const baseSchema = `
   scalar DateTime
   scalar JSON
@@ -41,21 +29,24 @@ export const baseSchema = `
   }
 `;
 
-export const schema = makeExecutableSchema({
-  typeDefs: [
-    baseSchema,
-    load('communities.graphql'),
-    load('users.graphql'),
-    load('profiles.graphql'),
-    load('posts.graphql'),
-  ],
-  resolvers: mergeOptions(
-    {},
-    {
-      DateTime: GraphQLDateTime,
-      JSON: JSONScalar,
-    },
-    makeProfileResolver(client),
-    makeUserResolver(client),
-  ),
-});
+export function schema(client: Knex) {
+  console.log('schema called');
+  return makeExecutableSchema({
+    typeDefs: [
+      baseSchema,
+      load('communities.graphql'),
+      load('users.graphql'),
+      load('profiles.graphql'),
+      load('posts.graphql'),
+    ],
+    resolvers: mergeOptions(
+      {},
+      {
+        DateTime: GraphQLDateTime,
+        JSON: JSONScalar,
+      },
+      makeProfileResolver(client),
+      makeUserResolver(client),
+    ),
+  });
+}
