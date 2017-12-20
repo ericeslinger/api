@@ -77,6 +77,7 @@ class APIServer {
         console.log(`listening on http://localhost:3000/graphiql`);
     }
     async stop() {
+        console.log('stopping');
         await this.knex.destroy();
         return this.server.stop();
     }

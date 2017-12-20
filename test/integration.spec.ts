@@ -21,6 +21,7 @@ async function query(q: string) {
 describe('fetches', () => {
   const server = new APIServer();
   before(() => server.start(false));
+  after(() => server.stop());
   it('should load user objects', async () => {
     const response = await query(`{ users { name } }`);
     expect(response.data.users).to.have.length(4);
