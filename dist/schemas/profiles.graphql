@@ -1,5 +1,6 @@
 extend type Query {
   profiles: [Profile]
+  profile(id: String!): Profile
 }
 
 type Profile implements Node {

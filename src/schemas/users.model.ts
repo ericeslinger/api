@@ -1,22 +1,22 @@
-import { loadSchema } from './load';
-import { Resolver } from './resolver';
 import Knex from 'knex';
 
-export const schema = loadSchema('users.graphql');
+import { loadSchema } from './load';
+import { Model } from './model';
 
-export function makeUserResolver(db: Knex) {
-  const r = new Resolver(db, 'florence.users');
-  return {
-    Query: {
-      users: (obj, args, context, info) => r.getAll(),
-    },
-    User: {
-      profiles: r.join({
+export class UserModel extends Model {
+  static opts = {
+    schema: loadSchema('users.graphql'),
+    table: 'florence.users',
+    name: 'User',
+    pluralName: 'users',
+    lowerName: 'user',
+    joins: {
+      profiles: {
         joinTable: 'florence.profiles_users_join',
         thisField: 'user_id',
         thatField: 'profile_id',
-        otherTable: 'florence.profiles',
-      }),
+        thatName: 'Profile',
+      },
     },
   };
 }

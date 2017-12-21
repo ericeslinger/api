@@ -3,27 +3,26 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.schema = undefined;
-exports.makeProfileResolver = makeProfileResolver;
+exports.ProfileModel = undefined;
 
 var _load = require('./load');
 
-var _resolver = require('./resolver');
+var _model = require('./model');
 
-const schema = exports.schema = (0, _load.loadSchema)('profiles.graphql');
-function makeProfileResolver(db) {
-    const r = new _resolver.Resolver(db, 'florence.profiles');
-    return {
-        Query: {
-            profiles: (obj, args, context, info) => r.getAll()
-        },
-        Profile: {
-            users: r.join({
-                joinTable: 'florence.profiles_users_join',
-                thatField: 'user_id',
-                thisField: 'profile_id',
-                otherTable: 'florence.users'
-            })
+class ProfileModel extends _model.Model {}
+exports.ProfileModel = ProfileModel;
+ProfileModel.opts = {
+    schema: (0, _load.loadSchema)('profiles.graphql'),
+    table: 'florence.profiles',
+    name: 'Profile',
+    pluralName: 'profiles',
+    lowerName: 'profile',
+    joins: {
+        users: {
+            joinTable: 'florence.profiles_users_join',
+            thisField: 'profile_id',
+            thatField: 'user_id',
+            thatName: 'User'
         }
-    };
-}
+    }
+};

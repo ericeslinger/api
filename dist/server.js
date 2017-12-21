@@ -17,10 +17,17 @@ var _knex = require('knex');
 
 var _knex2 = _interopRequireDefault(_knex);
 
+var _mergeOptions = require('merge-options');
+
+var _mergeOptions2 = _interopRequireDefault(_mergeOptions);
+
+var _schemas = require('./schemas');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const HOST = 'localhost';
 const PORT = 3000;
+
 process.on('unhandledRejection', r => console.log(r));
 class APIServer {
     constructor() {
@@ -29,7 +36,7 @@ class APIServer {
     async start(withUI) {
         this.knex = (0, _knex2.default)({
             client: 'pg',
-            debug: false,
+            debug: true,
             connection: {
                 database: 'florence',
                 user: 'flo',
@@ -38,7 +45,10 @@ class APIServer {
                 password: 'fumfum'
             }
         });
-        const memoSchema = (0, _index.schema)(this.knex);
+        const userModel = new _schemas.UserModel(this.knex);
+        const modelTypes = [_schemas.UserModel, _schemas.ProfileModel];
+        const models = modelTypes.map(T => new T(this.knex));
+        const memoSchema = (0, _index.schema)(this.knex, models);
         await this.server.register({
             plugin: _apolloServerHapi.graphqlHapi,
             options: {
@@ -50,9 +60,9 @@ class APIServer {
                 route: {
                     cors: true,
                     pre: [{
-                        method: async req => {
-                            return true;
-                        },
+                        method: async req => (0, _mergeOptions2.default)(...models.map(model => ({
+                            [model.opts.name]: model.loader()
+                        }))),
                         assign: 'loaders'
                     }]
                 }

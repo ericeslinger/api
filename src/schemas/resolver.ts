@@ -9,7 +9,6 @@ export class Resolver {
     thatField: string;
   }) {
     return (obj, _args, context, info) => {
-      console.log(context.pre);
       return this.db(args.joinTable)
         .join(
           args.otherTable,

@@ -10,7 +10,6 @@ class Resolver {
     }
     join(args) {
         return (obj, _args, context, info) => {
-            console.log(context.pre);
             return this.db(args.joinTable).join(args.otherTable, `${args.joinTable}.${args.thatField}`, '=', `${args.otherTable}.id`).where({ [args.thisField]: obj.id }).select(`${args.otherTable}.*`);
         };
     }
