@@ -1,0 +1,5 @@
+type ProfileUser {
+  user: User
+  profile: Profile
+  createdAt: Date
+}

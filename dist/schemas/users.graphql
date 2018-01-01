@@ -3,7 +3,7 @@ extend type Query {
   user(id: String!): User
 }
 
-type User implements Node {
+type User {
   id: ID!
   name: String!
   profiles: [Profile]

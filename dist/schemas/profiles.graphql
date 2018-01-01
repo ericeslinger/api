@@ -3,7 +3,7 @@ extend type Query {
   profile(id: String!): Profile
 }
 
-type Profile implements Node {
+type Profile {
   id: ID!
   name: String!
   about: JSON!
