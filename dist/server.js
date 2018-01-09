@@ -11,7 +11,7 @@ var _hapi2 = _interopRequireDefault(_hapi);
 
 var _apolloServerHapi = require('apollo-server-hapi');
 
-var _index = require('./schemas/index');
+var _index = require('./models/index');
 
 var _knex = require('knex');
 
@@ -21,7 +21,7 @@ var _mergeOptions = require('merge-options');
 
 var _mergeOptions2 = _interopRequireDefault(_mergeOptions);
 
-var _schemas = require('./schemas');
+var _models = require('./models');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45,8 +45,8 @@ class APIServer {
                 password: 'fumfum'
             }
         });
-        const userModel = new _schemas.UserModel(this.knex);
-        const modelTypes = [_schemas.UserModel, _schemas.ProfileModel];
+        const userModel = new _models.UserModel(this.knex);
+        const modelTypes = [_models.UserModel, _models.ProfileModel];
         const models = modelTypes.map(T => new T(this.knex));
         const memoSchema = (0, _index.schema)(this.knex, models);
         await this.server.register({

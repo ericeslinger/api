@@ -7,6 +7,9 @@ export interface JoinData {
   thatName: string;
   thisField: string;
   thatField: string;
+  filters?: {
+    [field: string]: string;
+  };
 }
 
 export interface ModelOptions {
@@ -15,7 +18,14 @@ export interface ModelOptions {
   pluralName: string;
   lowerName: string;
   joins: { [key: string]: JoinData };
-  schema: string;
+  schema?: string;
+}
+
+export function ccMap(arg: { [key: string]: any }) {
+  return Object.keys(arg).reduce(
+    (acc, curr) => Object.assign(acc, { [camelcase(curr)]: arg[curr] }),
+    {},
+  );
 }
 
 export class Model {
@@ -38,7 +48,10 @@ export class Model {
   querySchema() {
     const rv = {
       Query: {
-        [this.opts.pluralName]: (obj, args, context, info) => this.getAll(),
+        [this.opts.pluralName]: async (obj, args, context, info) => {
+          const ids = await this.getAllIds();
+          return ids.map(v => context.pre.loaders[this.opts.name].load(v));
+        },
         [this.opts.lowerName]: (obj, args, context, info) => {
           return context.pre.loaders[this.opts.name].load(args.id);
         },
@@ -50,17 +63,21 @@ export class Model {
       }
       rv[this.opts.name][join] = this.join(this.opts.joins[join]);
     });
+    console.log(Object.keys(rv));
     return rv;
   }
 
   // utility methods for building resolvers
-  join(args: JoinData) {
-    return async (obj, _args, context, info) => {
-      const toLoad = await this.db(args.joinTable)
-        .where({ [args.thisField]: obj.id })
-        .select(args.thatField);
-      return await context.pre.loaders[args.thatName].loadMany(
-        toLoad.map(v => v[args.thatField]),
+  join(opts: JoinData) {
+    return async (obj, args, context, info) => {
+      const toLoad = await Object.keys(opts.filters)
+        .reduce(
+          (acc, curr) => acc.where(curr, opts.filters[curr], args[curr]),
+          this.db(opts.joinTable).where({ [opts.thisField]: obj.id }),
+        )
+        .select('*');
+      return toLoad.map(v =>
+        Object.assign(v, { __type: opts.thatName, __id: opts.thatField }),
       );
     };
   }
@@ -72,15 +89,20 @@ export class Model {
         .then(v => v[0] || null),
     );
   }
-  getByIds(ids: string[]) {
-    return Promise.resolve<any[]>(
-      this.db(this.opts.table)
-        .whereIn('id', ids)
-        .select('*'),
-    );
+  async getByIds(ids: string[]) {
+    const init = await this.db(this.opts.table)
+      .whereIn('id', ids)
+      .select('*');
+    return ids
+      .map(id => init.find(v => v.id === id) || null)
+      .map(v => (v ? ccMap(v) : v));
   }
   getAll() {
     return this.db(this.opts.table).select('*');
+  }
+  async getAllIds() {
+    const idObj = await this.db(this.opts.table).select('id');
+    return idObj.map(v => v.id);
   }
 
   static opts: ModelOptions;

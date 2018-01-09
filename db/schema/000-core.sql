@@ -22,6 +22,7 @@ create table florence.profiles (
 create table florence.profiles_users_join (
   user_id text not null references florence.users(id),
   profile_id text not null references florence.profiles(id),
+  level int not null default 3,
   created_at timestamptz not null default now()
 );
 

@@ -5,14 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.UserModel = undefined;
 
-var _load = require('./load');
-
 var _model = require('./model');
 
 class UserModel extends _model.Model {}
 exports.UserModel = UserModel;
 UserModel.opts = {
-    schema: (0, _load.loadSchema)('users.graphql'),
+    // schema: loadSchema('users.graphql'),
     table: 'florence.users',
     name: 'User',
     pluralName: 'users',
@@ -22,7 +20,10 @@ UserModel.opts = {
             joinTable: 'florence.profiles_users_join',
             thisField: 'user_id',
             thatField: 'profile_id',
-            thatName: 'Profile'
+            thatName: 'Profile',
+            filters: {
+                level: '>='
+            }
         }
     }
 };

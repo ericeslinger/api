@@ -24,9 +24,8 @@ type Community {
   name: String!
   description: JSON!
   draft: JSON!
-  members: [Profile]
-  moderators: [Profile]
-  conversations: [Post]
+  members(level: Int): [CommunityProfileRelationship]
+  conversations: [CommunityPostRelationship]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -36,10 +35,8 @@ type Post {
   title: String!
   body: JSON!
   draft: JSON!
-  communities: [Community]
-  viewers: [Profile]
-  commenters: [Profile]
-  editors: [Profile]
+  communities(level: Int): [CommunityPostRelationship]
+  participants(level: Int): [PostProfileRelationship]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -49,9 +46,9 @@ type Profile {
   name: String!
   about: JSON!
   draft: JSON!
-  users: [User]
-  posts: [PostProfileRelationship]
-  memberships: [CommunityProfileRelationship]
+  users(level: Int): [ProfileUserRelationship]
+  posts(level: Int): [PostProfileRelationship]
+  memberships(level: Int): [CommunityProfileRelationship]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -59,12 +56,20 @@ type Profile {
 type User {
   id: ID!
   name: String!
-  profiles: [Profile]
+  profiles(level: Int): [ProfileUserRelationship]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 # relationships
+
+type CommunityPostRelationship {
+  community: Community!
+  post: Post!
+  updatedAt: DateTime!
+  createdAt: DateTime!
+  level: Int!
+}
 
 type ProfileUserRelationship {
   profile: Profile!

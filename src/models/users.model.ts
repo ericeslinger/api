@@ -5,7 +5,7 @@ import { Model } from './model';
 
 export class UserModel extends Model {
   static opts = {
-    schema: loadSchema('users.graphql'),
+    // schema: loadSchema('users.graphql'),
     table: 'florence.users',
     name: 'User',
     pluralName: 'users',
@@ -16,6 +16,9 @@ export class UserModel extends Model {
         thisField: 'user_id',
         thatField: 'profile_id',
         thatName: 'Profile',
+        filters: {
+          level: '>=',
+        },
       },
     },
   };

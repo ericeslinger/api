@@ -1,13 +1,13 @@
 import Hapi from 'hapi';
 import { graphqlHapi, graphiqlHapi } from 'apollo-server-hapi';
-import { schema } from './schemas/index';
+import { schema } from './models/index';
 import Knex from 'knex';
 import mergeOptions from 'merge-options';
 
 const HOST = 'localhost';
 const PORT = 3000;
 
-import { Model, UserModel, ProfileModel } from './schemas';
+import { Model, UserModel, ProfileModel } from './models';
 process.on('unhandledRejection', r => console.log(r));
 
 export class APIServer {

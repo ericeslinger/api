@@ -5,14 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ProfileModel = undefined;
 
-var _load = require('./load');
-
 var _model = require('./model');
 
 class ProfileModel extends _model.Model {}
 exports.ProfileModel = ProfileModel;
 ProfileModel.opts = {
-    schema: (0, _load.loadSchema)('profiles.graphql'),
+    // schema: loadSchema('profiles.graphql'),
     table: 'florence.profiles',
     name: 'Profile',
     pluralName: 'profiles',

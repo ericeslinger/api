@@ -5,7 +5,7 @@ import { Model } from './model';
 
 export class ProfileModel extends Model {
   static opts = {
-    schema: loadSchema('profiles.graphql'),
+    // schema: loadSchema('profiles.graphql'),
     table: 'florence.profiles',
     name: 'Profile',
     pluralName: 'profiles',
